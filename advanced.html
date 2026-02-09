@@ -1,0 +1,1252 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mersenne Prime Explorer | Mathematical Visualization Engine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;400;700;800&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --neon-cyan: #00f3ff;
+      --neon-pink: #ff00ff;
+      --neon-purple: #bf00ff;
+      --deep-space: #050508;
+      --glass: rgba(255, 255, 255, 0.03);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--deep-space);
+      color: #e0e0e0;
+      font-family: 'Space Grotesk', sans-serif;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Animated Background */
+    .cosmic-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+    }
+
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 3s infinite;
+    }
+
+    @keyframes twinkle {
+
+      0%,
+      100% {
+        opacity: 0.3;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+    }
+
+    /* Glitch Effect */
+    .glitch {
+      position: relative;
+      animation: glitch-skew 1s infinite;
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .glitch::before {
+      animation: glitch-anim-1 2s infinite linear alternate-reverse;
+      color: var(--neon-cyan);
+      z-index: -1;
+    }
+
+    .glitch::after {
+      animation: glitch-anim-2 3s infinite linear alternate-reverse;
+      color: var(--neon-pink);
+      z-index: -2;
+    }
+
+    @keyframes glitch-anim-1 {
+      0% {
+        clip-path: inset(20% 0 80% 0);
+        transform: translate(-2px, 0);
+      }
+
+      20% {
+        clip-path: inset(60% 0 10% 0);
+        transform: translate(2px, 0);
+      }
+
+      40% {
+        clip-path: inset(40% 0 50% 0);
+        transform: translate(-2px, 0);
+      }
+
+      60% {
+        clip-path: inset(80% 0 5% 0);
+        transform: translate(2px, 0);
+      }
+
+      80% {
+        clip-path: inset(10% 0 70% 0);
+        transform: translate(-2px, 0);
+      }
+
+      100% {
+        clip-path: inset(30% 0 20% 0);
+        transform: translate(2px, 0);
+      }
+    }
+
+    @keyframes glitch-anim-2 {
+      0% {
+        clip-path: inset(15% 0 85% 0);
+        transform: translate(2px, 0);
+      }
+
+      20% {
+        clip-path: inset(65% 0 5% 0);
+        transform: translate(-2px, 0);
+      }
+
+      40% {
+        clip-path: inset(45% 0 45% 0);
+        transform: translate(2px, 0);
+      }
+
+      60% {
+        clip-path: inset(85% 0 10% 0);
+        transform: translate(-2px, 0);
+      }
+
+      80% {
+        clip-path: inset(5% 0 75% 0);
+        transform: translate(2px, 0);
+      }
+
+      100% {
+        clip-path: inset(35% 0 25% 0);
+        transform: translate(-2px, 0);
+      }
+    }
+
+    @keyframes glitch-skew {
+      0% {
+        transform: skew(0deg);
+      }
+
+      10% {
+        transform: skew(-2deg);
+      }
+
+      20% {
+        transform: skew(2deg);
+      }
+
+      30% {
+        transform: skew(0deg);
+      }
+
+      100% {
+        transform: skew(0deg);
+      }
+    }
+
+    /* Neural Network Canvas */
+    #neural-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.4;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--deep-space);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--neon-cyan);
+      border-radius: 4px;
+    }
+
+    /* Glassmorphism */
+    .glass-panel {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    /* Binary Rain */
+    .binary-rain {
+      position: absolute;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: rgba(0, 243, 255, 0.3);
+      pointer-events: none;
+      animation: fall linear;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(100vh);
+      }
+    }
+
+    /* Holographic Card */
+    .holo-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .holo-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg,
+          transparent 30%,
+          rgba(0, 243, 255, 0.1) 50%,
+          transparent 70%);
+      transform: rotate(45deg);
+      transition: all 0.5s;
+      opacity: 0;
+    }
+
+    .holo-card:hover::before {
+      animation: holo-shine 0.5s ease-in-out;
+      opacity: 1;
+    }
+
+    @keyframes holo-shine {
+      0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+      }
+
+      100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+      }
+    }
+
+    /* Input Styling */
+    .cyber-input {
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(0, 243, 255, 0.3);
+      color: var(--neon-cyan);
+      font-family: 'JetBrains Mono', monospace;
+      transition: all 0.3s;
+    }
+
+    .cyber-input:focus {
+      outline: none;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+    }
+
+    /* Button Effects */
+    .cyber-btn {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .cyber-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .cyber-btn:hover::before {
+      left: 100%;
+    }
+
+    .cyber-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0, 243, 255, 0.4);
+    }
+
+    /* Terminal Effect */
+    .terminal-line {
+      border-left: 2px solid var(--neon-cyan);
+      padding-left: 1rem;
+      margin: 0.5rem 0;
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Particle Container */
+    #particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--neon-cyan);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    /* 3D Tilt Effect */
+    .tilt-card {
+      transform-style: preserve-3d;
+      transform: perspective(1000px);
+    }
+
+    .tilt-content {
+      transform: translateZ(20px);
+    }
+
+    /* Scanline Effect */
+    .scanlines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom,
+          transparent 50%,
+          rgba(0, 0, 0, 0.1) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.3;
+    }
+
+    /* Glowing Text */
+    .glow-text {
+      text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-cyan);
+    }
+
+    /* Matrix Rain Container */
+    #matrix-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.1;
+    }
+
+    /* Result Animation */
+    .result-pulse {
+      animation: pulse-glow 2s infinite;
+    }
+
+    @keyframes pulse-glow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 5px var(--neon-cyan);
+      }
+
+      50% {
+        box-shadow: 0 0 20px var(--neon-cyan), 0 0 40px var(--neon-purple);
+      }
+    }
+
+    /* Loading Animation */
+    .loader {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--neon-cyan);
+      border-radius: 50%;
+      display: inline-block;
+      position: relative;
+      animation: rotation 1s linear infinite;
+    }
+
+    .loader::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-bottom-color: var(--neon-pink);
+      animation: rotation 0.5s linear infinite reverse;
+    }
+
+    @keyframes rotation {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Custom Cursor Trail */
+    .cursor-trail {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--neon-cyan);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.1s;
+      mix-blend-mode: difference;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Background Elements -->
+  <div class="cosmic-bg"></div>
+  <div class="stars" id="stars"></div>
+  <div class="scanlines"></div>
+  <canvas id="matrix-container"></canvas>
+  <div id="particles"></div>
+  <div class="cursor-trail" id="cursor-trail"></div>
+
+  <!-- Neural Network Background -->
+  <canvas id="neural-canvas"></canvas>
+
+  <!-- Main Container -->
+  <div class="min-h-screen relative z-10">
+
+    <!-- Header -->
+    <header class="fixed top-0 w-full z-50 glass-panel border-b border-cyan-500/20">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 border-2 border-cyan-400 rounded-lg flex items-center justify-center animate-pulse">
+            <span class="mono text-cyan-400 font-bold text-xl">M</span>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold tracking-wider glitch" data-text="MERSENNE">MERSENNE</h1>
+            <p class="text-xs text-cyan-400/70 mono tracking-widest">PRIME EXPLORER v2.0.47</p>
+          </div>
+        </div>
+        <div class="hidden md:flex gap-6 mono text-sm">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span class="text-green-400">SYSTEM ONLINE</span>
+          </div>
+          <div class="text-cyan-400/50" id="clock">00:00:00</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-6 relative overflow-hidden">
+      <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+
+        <!-- Left Content -->
+        <div class="space-y-8 tilt-card" id="hero-card">
+          <div class="tilt-content space-y-6">
+            <div class="inline-block px-4 py-1 border border-cyan-500/30 rounded-full bg-cyan-500/10">
+              <span class="mono text-cyan-400 text-sm tracking-widest">MATHEMATICAL COMPUTATION ENGINE</span>
+            </div>
+
+            <h2 class="text-5xl md:text-7xl font-bold leading-tight">
+              Unlock the <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500 glow-text">Mysteries</span> of Mersenne Primes
+            </h2>
+
+            <p class="text-lg text-gray-400 leading-relaxed max-w-xl">
+              Explore the infinite realm of Mersenne numbers <span class="mono text-cyan-400">M<sub>p</sub> = 2<sup>p</sup> - 1</span>.
+              Witness real-time factorization using advanced modular exponentiation algorithms.
+            </p>
+
+            <div class="flex flex-wrap gap-4">
+              <button onclick="scrollToCalculator()" class="cyber-btn px-8 py-4 bg-cyan-500/20 border border-cyan-400 text-cyan-400 rounded-lg mono font-bold tracking-wider hover:bg-cyan-500/30">
+                INITIALIZE_SCAN()
+              </button>
+              <button onclick="showTheory()" class="cyber-btn px-8 py-4 border border-purple-500/50 text-purple-400 rounded-lg mono font-bold tracking-wider hover:bg-purple-500/20">
+                VIEW_THEORY()
+              </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-3 gap-4 pt-8 border-t border-gray-800">
+              <div>
+                <div class="text-2xl font-bold text-cyan-400 mono" id="stat-primes">51</div>
+                <div class="text-xs text-gray-500 uppercase tracking-wider">Known Primes</div>
+              </div>
+              <div>
+                <div class="text-2xl font-bold text-purple-400 mono" id="stat-digits">24M+</div>
+                <div class="text-xs text-gray-500 uppercase tracking-wider">Max Digits</div>
+              </div>
+              <div>
+                <div class="text-2xl font-bold text-pink-400 mono" id="stat-active">LIVE</div>
+                <div class="text-xs text-gray-500 uppercase tracking-wider">Status</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Visual -->
+        <div class="relative h-[500px] flex items-center justify-center">
+          <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-3xl blur-3xl animate-pulse"></div>
+          <div class="relative glass-panel rounded-2xl p-8 w-full max-w-md border border-cyan-500/30">
+            <div class="mono text-sm text-cyan-400/70 mb-4 flex justify-between">
+              <span>// MERSENNE VISUALIZATION</span>
+              <span class="animate-pulse">● REC</span>
+            </div>
+            <div class="space-y-3" id="mersenne-preview">
+              <div class="flex justify-between items-center p-3 bg-black/40 rounded border-l-2 border-cyan-400">
+                <span class="mono text-cyan-400">M₂</span>
+                <span class="mono text-gray-400">3 (PRIME)</span>
+              </div>
+              <div class="flex justify-between items-center p-3 bg-black/40 rounded border-l-2 border-purple-400">
+                <span class="mono text-purple-400">M₃</span>
+                <span class="mono text-gray-400">7 (PRIME)</span>
+              </div>
+              <div class="flex justify-between items-center p-3 bg-black/40 rounded border-l-2 border-pink-400">
+                <span class="mono text-pink-400">M₅</span>
+                <span class="mono text-gray-400">31 (PRIME)</span>
+              </div>
+              <div class="flex justify-between items-center p-3 bg-black/40 rounded border-l-2 border-red-400">
+                <span class="mono text-red-400">M₂₃</span>
+                <span class="mono text-gray-400">8,388,607 = 47 × 178,481</span>
+              </div>
+            </div>
+            <div class="mt-4 h-32 relative overflow-hidden rounded bg-black/60 border border-cyan-500/20">
+              <canvas id="waveform" class="w-full h-full"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Calculator Section -->
+    <section id="calculator" class="py-20 px-6 relative">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-12">
+          <h3 class="text-4xl font-bold mb-4 glitch" data-text="QUANTUM_FACTORIZATION">QUANTUM_FACTORIZATION</h3>
+          <p class="text-gray-400 max-w-2xl mx-auto">
+            Enter a prime exponent p to analyze M<sub>p</sub> = 2<sup>p</sup> - 1.
+            The engine will perform modular exponentiation to detect factors.
+          </p>
+        </div>
+
+        <div class="glass-panel rounded-2xl p-8 border border-cyan-500/20 shadow-2xl shadow-cyan-500/10">
+          <div class="grid md:grid-cols-2 gap-8">
+
+            <!-- Input Panel -->
+            <div class="space-y-6">
+              <div>
+                <label class="block mono text-cyan-400 text-sm mb-2 tracking-wider">EXPONENT_P (PRIME)</label>
+                <input type="number" id="exponent-input" class="cyber-input w-full px-6 py-4 rounded-lg text-2xl mono" placeholder="Enter prime number (e.g., 23, 929)" min="2">
+              </div>
+
+              <div class="flex gap-4">
+                <button onclick="analyzeMersenne()" class="cyber-btn flex-1 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg mono font-bold tracking-wider hover:shadow-lg hover:shadow-cyan-500/50">
+                  EXECUTE_SCAN()
+                </button>
+                <button onclick="clearResults()" class="cyber-btn px-6 py-4 border border-red-500/50 text-red-400 rounded-lg mono hover:bg-red-500/20">
+                  CLR
+                </button>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2">
+                <button onclick="quickTest(3)" class="cyber-btn py-2 border border-cyan-500/30 rounded text-xs mono text-cyan-400 hover:bg-cyan-500/20">TEST_M3</button>
+                <button onclick="quickTest(23)" class="cyber-btn py-2 border border-purple-500/30 rounded text-xs mono text-purple-400 hover:bg-purple-500/20">TEST_M23</button>
+                <button onclick="quickTest(929)" class="cyber-btn py-2 border border-pink-500/30 rounded text-xs mono text-pink-400 hover:bg-pink-500/20">TEST_M929</button>
+              </div>
+
+              <!-- Algorithm Steps -->
+              <div class="bg-black/60 rounded-lg p-4 border border-gray-800">
+                <h4 class="mono text-xs text-gray-500 mb-3 tracking-wider">ALGORITHM_STEPS</h4>
+                <div id="algorithm-steps" class="space-y-2 text-xs mono text-gray-400">
+                  <div class="terminal-line" style="animation-delay: 0.1s">1. Check if p is prime...</div>
+                  <div class="terminal-line" style="animation-delay: 0.2s">2. Generate candidates q = 2kp + 1...</div>
+                  <div class="terminal-line" style="animation-delay: 0.3s">3. Verify q ≡ 1 or 7 (mod 8)...</div>
+                  <div class="terminal-line" style="animation-delay: 0.4s">4. Check primality of q...</div>
+                  <div class="terminal-line" style="animation-delay: 0.5s">5. Compute 2^p mod q via binary method...</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="space-y-4">
+              <div id="result-container" class="hidden">
+                <div class="bg-black/80 rounded-lg p-6 border border-cyan-500/30 result-pulse">
+                  <div class="flex items-center justify-between mb-4">
+                    <span class="mono text-xs text-cyan-400 tracking-wider">RESULT_OUTPUT</span>
+                    <div class="flex gap-2">
+                      <div class="w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
+                      <div class="w-2 h-2 bg-cyan-400 rounded-full animate-ping" style="animation-delay: 0.2s"></div>
+                      <div class="w-2 h-2 bg-cyan-400 rounded-full animate-ping" style="animation-delay: 0.4s"></div>
+                    </div>
+                  </div>
+                  <div id="result-text" class="text-lg mono leading-relaxed"></div>
+                </div>
+
+                <div id="factor-details" class="hidden mt-4 bg-black/60 rounded-lg p-4 border border-purple-500/30">
+                  <h4 class="mono text-xs text-purple-400 mb-2">FACTORIZATION_DETAILS</h4>
+                  <div id="factor-text" class="mono text-sm text-gray-300"></div>
+                </div>
+
+                <div id="modular-visualization" class="mt-4 bg-black/60 rounded-lg p-4 border border-gray-800">
+                  <h4 class="mono text-xs text-gray-500 mb-3">MODULAR_EXPONENTIATION_TRACE</h4>
+                  <div id="mod-trace" class="space-y-1 text-xs mono"></div>
+                </div>
+              </div>
+
+              <div id="loading-indicator" class="hidden flex flex-col items-center justify-center h-64">
+                <div class="loader mb-4"></div>
+                <p class="mono text-cyan-400 animate-pulse">COMPUTING_MODULAR_EXPONENTIATION...</p>
+              </div>
+
+              <div id="initial-state" class="flex flex-col items-center justify-center h-64 text-gray-600">
+                <svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+                <p class="mono text-sm">AWAITING_INPUT...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Theory Section -->
+    <section id="theory" class="py-20 px-6 bg-black/30 border-y border-cyan-500/10 hidden">
+      <div class="max-w-6xl mx-auto">
+        <h3 class="text-3xl font-bold mb-12 text-center glitch" data-text="MATHEMATICAL_FOUNDATIONS">MATHEMATICAL_FOUNDATIONS</h3>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="holo-card glass-panel rounded-xl p-6 border border-cyan-500/20">
+            <div class="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center mb-4">
+              <span class="text-2xl text-cyan-400">1</span>
+            </div>
+            <h4 class="text-lg font-bold mb-2 text-cyan-400">Mersenne Form</h4>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              A Mersenne number is defined as <span class="mono text-cyan-400">M<sub>p</sub> = 2<sup>p</sup> - 1</span>.
+              For M<sub>p</sub> to be prime, p must itself be prime.
+            </p>
+          </div>
+
+          <div class="holo-card glass-panel rounded-xl p-6 border border-purple-500/20">
+            <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
+              <span class="text-2xl text-purple-400">2</span>
+            </div>
+            <h4 class="text-lg font-bold mb-2 text-purple-400">Factor Properties</h4>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              Any factor q of 2<sup>p</sup>-1 must be of form <span class="mono text-purple-400">q = 2kp + 1</span>,
+              be ≡ 1 or 7 (mod 8), and be prime.
+            </p>
+          </div>
+
+          <div class="holo-card glass-panel rounded-xl p-6 border border-pink-500/20">
+            <div class="w-12 h-12 bg-pink-500/20 rounded-lg flex items-center justify-center mb-4">
+              <span class="text-2xl text-pink-400">3</span>
+            </div>
+            <h4 class="text-lg font-bold mb-2 text-pink-400">Modular Test</h4>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              q divides M<sub>p</sub> iff <span class="mono text-pink-400">2<sup>p</sup> ≡ 1 (mod q)</span>.
+              We use binary exponentiation for O(log p) complexity.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-12 glass-panel rounded-xl p-8 border border-cyan-500/20">
+          <h4 class="text-xl font-bold mb-6 text-cyan-400 mono">BINARY_EXPONENTIATION_EXAMPLE: 2^23 mod 47</h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm mono">
+              <thead>
+                <tr class="border-b border-cyan-500/30 text-cyan-400">
+                  <th class="text-left py-2">Step</th>
+                  <th class="text-left py-2">Binary Bit</th>
+                  <th class="text-left py-2">Operation</th>
+                  <th class="text-left py-2">Result mod 47</th>
+                </tr>
+              </thead>
+              <tbody class="text-gray-400" id="example-table">
+                <tr class="border-b border-gray-800">
+                  <td class="py-2">Init</td>
+                  <td>-</td>
+                  <td>square = 1</td>
+                  <td class="text-cyan-400">1</td>
+                </tr>
+                <tr class="border-b border-gray-800">
+                  <td class="py-2">1</td>
+                  <td class="text-purple-400">1 (MSB)</td>
+                  <td>square = 1²×2 mod 47</td>
+                  <td class="text-cyan-400">2</td>
+                </tr>
+                <tr class="border-b border-gray-800">
+                  <td class="py-2">2</td>
+                  <td class="text-gray-600">0</td>
+                  <td>square = 2² mod 47</td>
+                  <td class="text-cyan-400">4</td>
+                </tr>
+                <tr class="border-b border-gray-800">
+                  <td class="py-2">3</td>
+                  <td class="text-purple-400">1</td>
+                  <td>square = 4²×2 mod 47</td>
+                  <td class="text-cyan-400">32</td>
+                </tr>
+                <tr class="border-b border-gray-800">
+                  <td class="py-2">4</td>
+                  <td class="text-purple-400">1</td>
+                  <td>square = 32²×2 mod 47</td>
+                  <td class="text-cyan-400">27</td>
+                </tr>
+                <tr class="border-b border-gray-800">
+                  <td class="py-2">5</td>
+                  <td class="text-purple-400">1 (LSB)</td>
+                  <td>square = 27²×2 mod 47</td>
+                  <td class="text-green-400 font-bold">1 ✓</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-gray-500 text-sm">
+            Since 2^23 ≡ 1 (mod 47), we confirm 47 is a factor of M_23 = 8,388,607.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-cyan-500/10 bg-black/50">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="text-center md:text-left">
+          <h4 class="text-xl font-bold text-cyan-400 mono mb-2">MERSENNE_EXPLORER</h4>
+          <p class="text-sm text-gray-600">Computational Mathematics Visualization Platform</p>
+        </div>
+        <div class="flex gap-6 text-sm mono text-gray-500">
+          <span>BUILD: 2.0.47</span>
+          <span class="text-cyan-500">●</span>
+          <span>LATENCY: <span id="latency">0</span>ms</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Initialize Background Effects
+    document.addEventListener('DOMContentLoaded', () => {
+      initStars();
+      initNeuralNetwork();
+      initMatrixRain();
+      initClock();
+      initWaveform();
+      initCursorTrail();
+      initTiltEffect();
+      // Update latency randomly
+      setInterval(() => {
+        document.getElementById('latency').textContent = Math.floor(Math.random() * 20 + 5);
+      }, 1000);
+    });
+    // Starfield Background
+    function initStars() {
+      const container = document.getElementById('stars');
+      for (let i = 0; i < 200; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.width = star.style.height = Math.random() * 3 + 'px';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        container.appendChild(star);
+      }
+    }
+    // Neural Network Canvas
+    function initNeuralNetwork() {
+      const canvas = document.getElementById('neural-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const nodes = [];
+      const nodeCount = 50;
+      for (let i = 0; i < nodeCount; i++) {
+        nodes.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Update nodes
+        nodes.forEach(node => {
+          node.x += node.vx;
+          node.y += node.vy;
+          if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
+          if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
+        });
+        // Draw connections
+        ctx.strokeStyle = 'rgba(0, 243, 255, 0.1)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const dx = nodes[i].x - nodes[j].x;
+            const dy = nodes[i].y - nodes[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 150) {
+              ctx.beginPath();
+              ctx.moveTo(nodes[i].x, nodes[i].y);
+              ctx.lineTo(nodes[j].x, nodes[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+        // Draw nodes
+        nodes.forEach(node => {
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, 2, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(0, 243, 255, 0.5)';
+          ctx.fill();
+        });
+        requestAnimationFrame(animate);
+      }
+      animate();
+      window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+    }
+    // Matrix Rain Effect
+    function initMatrixRain() {
+      const canvas = document.getElementById('matrix-container');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const chars = '01';
+      const fontSize = 14;
+      const columns = canvas.width / fontSize;
+      const drops = [];
+      for (let i = 0; i < columns; i++) {
+        drops[i] = Math.random() * -100;
+      }
+
+      function draw() {
+        ctx.fillStyle = 'rgba(5, 5, 8, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#00f3ff';
+        ctx.font = fontSize + 'px monospace';
+        for (let i = 0; i < drops.length; i++) {
+          const text = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          drops[i]++;
+        }
+      }
+      setInterval(draw, 35);
+    }
+    // Clock
+    function initClock() {
+      function update() {
+        const now = new Date();
+        document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', {
+          hour12: false,
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+      }
+      update();
+      setInterval(update, 1000);
+    }
+    // Waveform Visualization
+    function initWaveform() {
+      const canvas = document.getElementById('waveform');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      let phase = 0;
+
+      function draw() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.strokeStyle = '#00f3ff';
+        ctx.lineWidth = 2;
+        for (let x = 0; x < canvas.width; x++) {
+          const y = canvas.height / 2 +
+            Math.sin(x * 0.02 + phase) * 20 * Math.sin(phase * 0.5) +
+            Math.sin(x * 0.05 + phase * 2) * 10;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        phase += 0.05;
+        requestAnimationFrame(draw);
+      }
+      draw();
+    }
+    // Cursor Trail
+    function initCursorTrail() {
+      const trail = document.getElementById('cursor-trail');
+      let mouseX = 0,
+        mouseY = 0;
+      let trailX = 0,
+        trailY = 0;
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+
+      function animate() {
+        trailX += (mouseX - trailX) * 0.1;
+        trailY += (mouseY - trailY) * 0.1;
+        trail.style.left = trailX - 10 + 'px';
+        trail.style.top = trailY - 10 + 'px';
+        requestAnimationFrame(animate);
+      }
+      animate();
+      // Click particles
+      document.addEventListener('click', (e) => {
+        createParticles(e.clientX, e.clientY);
+      });
+    }
+    // Particle Explosion
+    function createParticles(x, y) {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 12; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        const angle = (Math.PI * 2 * i) / 12;
+        const velocity = 50 + Math.random() * 50;
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+        particle.style.setProperty('--tx', tx + 'px');
+        particle.style.setProperty('--ty', ty + 'px');
+        container.appendChild(particle);
+        const animation = particle.animate([{
+            transform: 'translate(0,0) scale(1)',
+            opacity: 1
+          },
+          {
+            transform: `translate(${tx}px, ${ty}px) scale(0)`,
+            opacity: 0
+          }
+        ], {
+          duration: 800,
+          easing: 'cubic-bezier(0, .9, .57, 1)'
+        });
+        animation.onfinish = () => particle.remove();
+      }
+    }
+    // 3D Tilt Effect
+    function initTiltEffect() {
+      const card = document.getElementById('hero-card');
+      document.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = (y - centerY) / 20;
+        const rotateY = (centerX - x) / 20;
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      });
+      document.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+      });
+    }
+    // Core Mersenne Functions
+    function isPrime(n) {
+      if (n < 2) return false;
+      if (n === 2) return true;
+      if (n % 2 === 0) return false;
+      for (let i = 3; i * i <= n; i += 2) {
+        if (n % i === 0) return false;
+      }
+      return true;
+    }
+
+    function modPow(base, exponent, modulus, trace = []) {
+      if (modulus === 1) return 0;
+      let result = 1;
+      base = base % modulus;
+      let step = 0;
+      // Convert exponent to binary for display
+      const binary = exponent.toString(2);
+      while (exponent > 0) {
+        const bit = exponent & 1;
+        const oldResult = result;
+        if (bit) {
+          result = (result * base) % modulus;
+        }
+        exponent = exponent >> 1;
+        if (exponent > 0) {
+          base = (base * base) % modulus;
+        }
+        trace.push({
+          step: ++step,
+          bit: bit,
+          binary: binary,
+          result: result,
+          operation: bit ? 'square + multiply' : 'square only'
+        });
+      }
+      return result;
+    }
+
+    function checkMersenne(p) {
+      // Verify p is prime
+      if (!isPrime(p)) {
+        return {
+          isPrime: false,
+          message: `M${p} = 2^${p}-1 is not prime (exponent ${p} is not prime)`,
+          factor: null,
+          trace: []
+        };
+      }
+      // Special case for p=2
+      if (p === 2) {
+        return {
+          isPrime: true,
+          message: `M${p} = 2^${p}-1 = 3 is prime`,
+          factor: null,
+          trace: []
+        };
+      }
+      const limit = Math.sqrt(Math.pow(2, p) - 1);
+      let k = 1;
+      const trace = [];
+      while (true) {
+        const q = 2 * k * p + 1;
+        if (q > limit) break;
+        // Check q ≡ 1 or 7 (mod 8)
+        const mod8 = q % 8;
+        if (mod8 !== 1 && mod8 !== 7) {
+          k++;
+          continue;
+        }
+        // Check if q is prime
+        if (!isPrime(q)) {
+          k++;
+          continue;
+        }
+        // Check if 2^p ≡ 1 (mod q)
+        const modTrace = [];
+        const result = modPow(2, p, q, modTrace);
+        if (result === 1) {
+          const mersenneValue = BigInt(2) ** BigInt(p) - BigInt(1);
+          return {
+            isPrime: false,
+            message: `M${p} = 2^${p}-1 is composite with factor ${q}`,
+            factor: q,
+            mersenneValue: mersenneValue.toString(),
+            trace: modTrace,
+            k: k
+          };
+        }
+        k++;
+      }
+      return {
+        isPrime: true,
+        message: `M${p} = 2^${p}-1 is prime`,
+        factor: null,
+        trace: []
+      };
+    }
+    // UI Functions
+    function scrollToCalculator() {
+      document.getElementById('calculator').scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+
+    function showTheory() {
+      const theory = document.getElementById('theory');
+      theory.classList.toggle('hidden');
+      if (!theory.classList.contains('hidden')) {
+        theory.scrollIntoView({
+          behavior: 'smooth'
+        });
+      }
+    }
+
+    function quickTest(p) {
+      document.getElementById('exponent-input').value = p;
+      analyzeMersenne();
+    }
+
+    function clearResults() {
+      document.getElementById('result-container').classList.add('hidden');
+      document.getElementById('loading-indicator').classList.add('hidden');
+      document.getElementById('initial-state').classList.remove('hidden');
+      document.getElementById('exponent-input').value = '';
+    }
+    async function analyzeMersenne() {
+      const input = document.getElementById('exponent-input');
+      const p = parseInt(input.value);
+      if (!p || p < 2) {
+        alert('Please enter a valid prime number >= 2');
+        return;
+      }
+      // Show loading
+      document.getElementById('initial-state').classList.add('hidden');
+      document.getElementById('result-container').classList.add('hidden');
+      document.getElementById('loading-indicator').classList.remove('hidden');
+      // Simulate computation delay for effect
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Compute result
+      const result = checkMersenne(p);
+      // Hide loading, show results
+      document.getElementById('loading-indicator').classList.add('hidden');
+      document.getElementById('result-container').classList.remove('hidden');
+      // Display result
+      const resultText = document.getElementById('result-text');
+      const factorDetails = document.getElementById('factor-details');
+      const factorText = document.getElementById('factor-text');
+      const modTrace = document.getElementById('mod-trace');
+      // Color based on result
+      if (result.isPrime) {
+        resultText.className = 'text-lg mono leading-relaxed text-green-400';
+        factorDetails.classList.add('hidden');
+      } else {
+        resultText.className = 'text-lg mono leading-relaxed text-red-400';
+        if (result.factor) {
+          factorDetails.classList.remove('hidden');
+          factorText.innerHTML = `
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <span class="text-gray-500">Factor:</span>
+                                <span class="text-cyan-400 font-bold">${result.factor}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Form:</span>
+                                <span class="text-purple-400">2×${result.k}×${p}+1</span>
+                            </div>
+                            <div class="col-span-2">
+                                <span class="text-gray-500">Mersenne Number:</span>
+                                <div class="text-xs text-gray-400 mt-1 break-all">${result.mersenneValue}</div>
+                            </div>
+                        </div>
+                    `;
+        }
+      }
+      // Typewriter effect for result
+      resultText.textContent = '';
+      const text = result.message;
+      let i = 0;
+
+      function typeWriter() {
+        if (i < text.length) {
+          resultText.textContent += text.charAt(i);
+          i++;
+          setTimeout(typeWriter, 30);
+        }
+      }
+      typeWriter();
+      // Display modular trace if available
+      if (result.trace && result.trace.length > 0) {
+        modTrace.innerHTML = result.trace.slice(0, 10).map((t, idx) => `
+                    <div class="flex justify-between items-center p-2 bg-black/40 rounded border-l-2 ${t.bit ? 'border-purple-400' : 'border-gray-600'}">
+                        <span class="text-gray-500">Step ${t.step}:</span>
+                        <span class="${t.bit ? 'text-purple-400' : 'text-gray-400'}">${t.operation}</span>
+                        <span class="text-cyan-400">result = ${t.result}</span>
+                    </div>
+                `).join('');
+        if (result.trace.length > 10) {
+          modTrace.innerHTML += `<div class="text-center text-gray-500 mt-2">... ${result.trace.length - 10} more steps ...</div>`;
+        }
+      } else {
+        modTrace.innerHTML = '<div class="text-gray-500 italic">No modular exponentiation trace available (exponent may not be prime)</div>';
+      }
+      // Create success particles
+      if (result.factor) {
+        setTimeout(() => {
+          const rect = resultText.getBoundingClientRect();
+          createParticles(rect.left + rect.width / 2, rect.top);
+        }, 500);
+      }
+    }
+    // Enter key support
+    document.getElementById('exponent-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        analyzeMersenne();
+      }
+    });
+    // Binary rain effect on input focus
+    document.getElementById('exponent-input').addEventListener('focus', () => {
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          const drop = document.createElement('div');
+          drop.className = 'binary-rain';
+          drop.textContent = Math.random() > 0.5 ? '1' : '0';
+          drop.style.left = Math.random() * window.innerWidth + 'px';
+          drop.style.animationDuration = (Math.random() * 2 + 2) + 's';
+          document.body.appendChild(drop);
+          setTimeout(() => drop.remove(), 4000);
+        }, i * 200);
+      }
+    });
+  </script>
+</body>
+
+</html>
